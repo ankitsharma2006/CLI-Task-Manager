@@ -1,10 +1,11 @@
 import json
 from datetime import datetime
 
+#read operation
 with open("task.json", "r") as f:
    data=json.load(f)
 
-last_id = 0
+last_id = data["last_id"]
 
 def generate_id():
     global last_id
@@ -12,8 +13,12 @@ def generate_id():
     return last_id
 
 class Task:
-  def __init__(self,name: str, priority: int, deadline: str):
-    self.id = generate_id()
+  def __init__(self,name: str, priority: int, deadline: str,id=None):
+    if id is None:
+       self.id = generate_id()
+    else:
+       self.id = id
+      
     self.name = name
     self.priority = priority
     self.completed = False
@@ -30,14 +35,19 @@ class Task:
       }
   @classmethod
   def from_dict(cls, data):
-      task = cls(data["name"], data["priority"], data["deadline"])
+      task = cls(data["name"], data["priority"], data["deadline"],data["id"])
       task.id = data["id"]
       task.completed = data["completed"]
       task.date_created = data["date_created"]
       return task
+  
+tasks = {}
+for i in data["tasks"]:
+    task_data = data["tasks"][i]
+    task = Task.from_dict(task_data)
+    tasks[task.id] = task
 
-tasks={1: Task("Finish project", 1, "2026-12-31 18:00"),2: Task("Buy groceries", 2, "2026-09-15 12:00"),3: Task("Call mom", 3, "2026-09-01 20:00")}
-
+#write operation
 task_dict = {}
 for i in tasks:
     task = tasks[i]
