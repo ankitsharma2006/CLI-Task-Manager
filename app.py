@@ -1,16 +1,6 @@
 import json
+import os
 from datetime import datetime
-
-#read operation
-#with open("task.json", "r") as f:
-   #data=json.load(f)
-
-last_id = 0
-
-def generate_id():
-    global last_id
-    last_id += 1
-    return last_id
 
 class Task:
   def __init__(self,name: str, priority: int, deadline: str,id=None):
@@ -41,23 +31,41 @@ class Task:
       task.date_created = data["date_created"]
       return task
   
-tasks = {}
-# for i in data["tasks"]:
-#     task_data = data["tasks"][i]
-#     task = Task.from_dict(task_data)
-#     tasks[task.id] = task
+#read operation
+try:
+  with open("task.json", "r") as f:
+    data=json.load(f)
+
+  last_id = data["last_id"]
+
+  tasks = {}
+  for i in data["tasks"]:
+      task_data = data["tasks"][i]
+      task = Task.from_dict(task_data)
+      tasks[task.id] = task
+
+except (FileNotFoundError, json.JSONDecodeError):
+  last_id = 0
+  tasks = {}
+
+def generate_id():
+    global last_id
+    last_id += 1
+    return last_id
 
 x=True
 print("Welcome to the Task Manager!")
 while x:
-    print("1. Add Task")
-    print("2. View Tasks")
-    print("3. Update Task")
-    print("4. Delete Task")
-    print("5. Exit")
-    choice = input("Enter your choice: ")
+    print("CREATE Task")
+    print("LIST Tasks")
+    print("UPDATE Task")
+    print("DELETE Task")
+    print("DONE Task")
+    print("SEARCH Task")
+    print("EXIT the task manager")
+    choice = input("Enter command: ").upper()
     
-    if choice == "1":
+    if choice == "CREATE":
         name = input("Enter task name: ")
         priority = int(input("Enter task priority (1-3): "))
         deadline = input("Enter task deadline (YYYY-MM-DD): ")
@@ -65,11 +73,12 @@ while x:
         tasks[task.id] = task
         print(f"Task '{task.name}' added with ID {task.id}.")
     
-    elif choice == "2":
+    elif choice == "LIST":
+        print(f"ID | NAME | PRIORITY | COMPLETED | DEADLINE")
         for task in tasks.values():
-            print(f"ID: {task.id}, Name: {task.name}, Priority: {task.priority}, Completed: {task.completed}, Deadline: {task.deadline}")
+            print(f"{task.id} | {task.name} | {task.priority} | {task.completed} | {task.deadline}")
     
-    elif choice == "3":
+    elif choice == "UPDATE":
         task_id = int(input("Enter task ID to update: "))
         update=int(input("Enter 1 to update name, 2 to update priority, 3 to update deadline, 4 to update completed status, 5 to update all: "))
         if task_id in tasks:
@@ -99,7 +108,7 @@ while x:
         else:
             print("Task ID not found.")
     
-    elif choice == "4":
+    elif choice == "DELETE":
         task_id = int(input("Enter task ID to delete: "))
         if task_id in tasks:
             del tasks[task_id]
@@ -107,10 +116,26 @@ while x:
         else:
             print("Task ID not found.")
     
-    elif choice == "5":
+    elif choice == "DONE":
+        task_id = int(input("Enter task ID to mark as done: "))
+        if task_id in tasks:
+            tasks[task_id].completed = True
+            print(f"Task ID {task_id} marked as done.")
+        else:
+            print("Task ID not found.")
+    elif choice == "SEARCH":
+        search_name = input("Enter task name to search: ")  
+        found_tasks = [task for task in tasks.values() if search_name.lower() in task.name.lower()]
+        if found_tasks:
+            print(f"ID | NAME | PRIORITY | COMPLETED | DEADLINE")
+            for task in found_tasks:
+                print(f"{task.id} | {task.name} | {task.priority} | {task.completed} | {task.deadline}")
+        else:
+            print("No tasks found with that name.")
+    elif choice == "EXIT":
         x=False
     else:
-        print("Invalid choice. Please try again.")
+        print("Invalid command. Please try again.")
 
 #write operation
 task_dict = {}
