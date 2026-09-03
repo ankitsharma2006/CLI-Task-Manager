@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 
 class Task:
@@ -69,12 +68,26 @@ x=True
 print("Welcome to the Task Manager!")
 print("help - Show available commands")
 while x:
-    choice = input("Enter command: ").upper()
+    choice = input("Enter command: ").strip().upper()
     
     if choice == "CREATE":
-        name = input("Enter task name: ")
-        priority = input("Enter task priority (LOW, MEDIUM, HIGH): ").upper()
-        deadline = input("Enter task deadline (YYYY-MM-DD HH:MM:SS): ")
+        name = input("Enter task name: ").strip()
+        if name.strip() == "":
+            print("Task name cannot be empty. Please enter a valid name.")
+            continue
+        priority = input("Enter task priority (LOW, MEDIUM, HIGH): ").strip().upper()
+        if priority not in ["LOW", "MEDIUM", "HIGH"]:
+            print("Invalid priority. Please enter LOW, MEDIUM, or HIGH.")
+            continue
+        deadline = input("Enter task deadline (YYYY-MM-DD HH:MM): ").strip()
+        try:
+            datetime.strptime(deadline, "%Y-%m-%d %H:%M")
+            if deadline < datetime.now().strftime("%Y-%m-%d %H:%M"):
+                print("Deadline cannot be in the past. Please enter a future date and time.")
+                continue
+        except ValueError:
+            print("Invalid deadline format. Please use YYYY-MM-DD HH:MM.")
+            continue
         if available_ids:
             new_id = available_ids.pop(0)
         else:
@@ -84,31 +97,82 @@ while x:
         print(f"Task '{task.name}' added with ID {task.id}.")
     
     elif choice == "LIST":
-        print(f"ID | NAME | PRIORITY | COMPLETED | DEADLINE")
-        for task in tasks.values():
-            print(f"{task.id} | {task.name} | {task.priority} | {task.completed} | {task.deadline}")
+        if tasks:
+            print(f"ID  | NAME    | PRIORITY   | COMPLETED    | DEADLINE   ")
+            for task in tasks.values():
+              print(f"{task.id} | {task.name} | {task.priority} | {task.completed} | {task.deadline}")
+        else:
+            print("No tasks found.")
     
     elif choice == "UPDATE":
-        task_id = int(input("Enter task ID to update: "))
-        update=int(input("Enter 1 to update name, 2 to update priority, 3 to update deadline, 4 to update all: "))
-        if task_id in tasks:
-            task = tasks[task_id]
-            if update == 1:
-                task.name = input(f"Enter new name (current: {task.name}): ") or task.name
-            elif update == 2:
-                task.priority = input(f"Enter new priority (current: {task.priority}): ").upper() or task.priority
-            elif update == 3:
-                task.deadline = input(f"Enter new deadline (current: {task.deadline}): ") or task.deadline
-            elif update == 4:
-                task.name = input(f"Enter new name (current: {task.name}): ") or task.name
-                task.priority = input(f"Enter new priority (current: {task.priority}): ").upper() or task.priority
-                task.deadline = input(f"Enter new deadline (current: {task.deadline}): ") or task.deadline
-            print(f"Task ID {task.id} updated.")
-        else:
+        try:
+            task_id = int(input("Enter task ID to update: "))
+        except ValueError:
+            print("Invalid task ID. Please enter a valid integer.")
+            continue
+        if task_id not in tasks:
             print("Task ID not found.")
+            continue
+        try:
+            update = int(input("Enter 1 to update name, 2 to update priority, 3 to update deadline, 4 to update all: "))
+            if update not in [1, 2, 3, 4]:
+                print("Invalid option. Please enter 1, 2, 3, or 4.")
+                continue
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+            continue
+        task = tasks[task_id]
+        if update == 1:
+            task.name = input(f"Enter new name (current: {task.name}): ") or task.name
+            if task.name.strip() == "":
+                print("Task name cannot be empty. Please enter a valid name.")
+                continue
+        elif update == 2:
+            task_priority = input(f"Enter new priority (current: {task.priority}): ").upper() or task.priority
+            if task_priority not in ["LOW", "MEDIUM", "HIGH"]:
+                print("Invalid priority. Please enter LOW, MEDIUM, or HIGH.")
+                continue
+            task.priority = task_priority
+        elif update == 3:
+            task_deadline = input(f"Enter new deadline (current: {task.deadline}): ") or task.deadline
+            if task_deadline:
+                try:
+                    datetime.strptime(task_deadline, "%Y-%m-%d %H:%M")
+                    if task_deadline < datetime.now().strftime("%Y-%m-%d %H:%M"):
+                        print("Deadline cannot be in the past. Please enter a future date and time.")
+                        continue
+                    task.deadline = task_deadline
+                except ValueError:
+                    print("Invalid deadline format. Please use YYYY-MM-DD HH:MM.")
+                    continue
+        elif update == 4:
+            print("\nLeave a field blank to keep the current value.")
+            task_name = input(f"Enter new name (current: {task.name}): ") or task.name
+            task_priority = input(f"Enter new priority (current: {task.priority}): ").upper() or task.priority
+            if task_priority not in ["LOW", "MEDIUM", "HIGH"]:
+                print("Invalid priority. Please enter LOW, MEDIUM, or HIGH.")
+                continue
+            task_deadline = input(f"Enter new deadline (current: {task.deadline}): ") or task.deadline
+            if task_deadline:
+                try:
+                    datetime.strptime(task_deadline, "%Y-%m-%d %H:%M")
+                    if task_deadline < datetime.now().strftime("%Y-%m-%d %H:%M"):
+                        print("Deadline cannot be in the past. Please enter a future date and time.")
+                        continue
+                except ValueError:
+                    print("Invalid deadline format. Please use YYYY-MM-DD HH:MM.")
+                    continue
+            task.name = task_name
+            task.priority = task_priority
+            task.deadline = task_deadline
+        print(f"Task ID {task.id} updated.")
     
     elif choice == "DELETE":
-        task_id = int(input("Enter task ID to delete: "))
+        try:
+            task_id = int(input("Enter task ID to delete: "))
+        except ValueError:
+            print("Invalid task ID. Please enter a valid integer.")
+            continue
         if task_id in tasks:
             available_ids.append(task_id)
             del tasks[task_id]
@@ -117,7 +181,11 @@ while x:
             print("Task ID not found.")
     
     elif choice == "DONE":
-        task_id = int(input("Enter task ID to mark as done: "))
+        try:
+            task_id = int(input("Enter task ID to mark as done: "))
+        except ValueError:
+            print("Invalid task ID. Please enter a valid integer.")
+            continue
         if task_id in tasks:
             tasks[task_id].completed = True
             history[task_id] = tasks[task_id]
