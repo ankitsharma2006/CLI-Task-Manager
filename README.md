@@ -285,5 +285,4 @@ task-manager/
 ├── app.js          # Vibe-coded browser presentation logic
 └── README.md
 ```
-
 `app.py` and `task.json` are the core project files. The other files are used for the browser-based presentation.

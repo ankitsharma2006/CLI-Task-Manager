@@ -360,6 +360,7 @@ function updateCLI() {
           );
           return;
         }
+      
 
         const task = tasks[taskId];
 
