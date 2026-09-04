@@ -1,0 +1,34 @@
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:#050607;color:#d6d6d6}
+body{font-family:Consolas,"Courier New",monospace;font-size:16px}
+.terminal{width:100%;height:100vh;background:#050607;overflow:hidden}
+header{height:38px;background:#111416;border-bottom:1px solid #252a2d;display:flex;align-items:center;justify-content:center;color:#9da4a8;font-size:13px;position:relative}
+.dots{position:absolute;left:13px;color:#68706f;font-size:12px;letter-spacing:2px}
+.local{position:absolute;right:13px;color:#78e08f;font-size:11px}
+#screen{height:calc(100vh - 72px);overflow-y:auto;padding:22px 28px 30px;scroll-behavior:smooth}
+#output{max-width:1200px}
+.line{margin:0;min-height:26px;line-height:26px;white-space:pre-wrap;word-break:break-word}
+.muted{color:#929292}
+.green{color:#78e08f}
+.echo{color:#78e08f}
+.error{color:#ff7070}
+.warn{color:#e5b567}
+.info{color:#79a8ff}
+.success{color:#78e08f}
+.table{overflow-x:auto;margin:4px 0 10px}
+.table table{border-collapse:collapse;min-width:760px;width:100%}
+.table th{text-align:left;color:#858585;font-weight:normal;padding:4px 14px 6px 0;border-bottom:1px solid #292d30}
+.table td{padding:5px 14px 5px 0;border-bottom:1px solid #171a1c}
+.LOW{color:#78e08f}.MEDIUM{color:#e5b567}.HIGH{color:#ff7070}
+.help{display:grid;grid-template-columns:110px 1fr;gap:0 12px}
+.help b{font-weight:normal;color:#78e08f}
+#form{display:flex;align-items:center;min-height:28px}
+.prompt{color:#78e08f;margin-right:10px}
+#cmd{flex:1;background:transparent;border:0;outline:0;color:#d6d6d6;font:inherit;padding:0;margin:0;caret-color:#d6d6d6}
+#cmd::placeholder{color:#4b5053}
+footer{height:34px;border-top:1px solid #252a2d;background:#0b0e10;color:#4e5559;padding:9px 13px;text-align:left;font-size:10px}
+@media(max-width:700px){#screen{padding:18px 14px}body{font-size:14px}.line{line-height:24px;min-height:24px}}
+
+.file-link{color:#79a8ff;text-decoration:none;cursor:pointer}
+.file-link:hover{text-decoration:underline}
+.json-file{margin:0;color:#bfc5c8;font:inherit;line-height:1.45;white-space:pre-wrap}
